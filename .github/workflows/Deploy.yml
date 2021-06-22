@@ -13,5 +13,7 @@ jobs:
         uses: Amadevus/pwsh-script@v2.0.1
         with:
           script: |
+            git fetch origin main
+            git switch main
             $output = $(git log)
             Write-Host $output
