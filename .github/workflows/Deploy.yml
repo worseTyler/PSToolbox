@@ -90,6 +90,5 @@ jobs:
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
         }
         git status
-        cd \StagingChangedModules
-        ls
+        Get-ChildItem StagingChangedModules -Recurse
 
