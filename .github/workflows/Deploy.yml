@@ -7,38 +7,15 @@ defaults:
   run:
     shell: pwsh
 jobs:
-  Setup:
+  Deploy:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2   
-        with:
-          fetch-depth: 50
-  DiscoverChanges:
-    runs-on: windows-latest
-    needs: Setup
-    steps:
-    - name: DiscoverChanges
+    - uses: actions/checkout@v2   
+      with:
+        fetch-depth: 50
+    - name: Import Modules
       run: |
-        $changedModules = $(git diff --name-only HEAD HEAD~40)
-        $changedModules
-        $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
-        $modules = @()
-
-        foreach ($file in $files) 
-        {
-            if((Test-Path $file.FullName)){
-                $file
-                $fileDirectoryParent = $file.Directory.Parent
-                if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
-                    $modules += $file.Directory
-                }
-            }
-        }
-        $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
-        $modules.Length
-        For ($i=0; $i -lt $modules.Length; $i++)
-        {
-            $module = $modules[$i]
-            Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
-        }
+        Import-Module PackageManagement -RequiredVersion 1.0.0.1
+        Install-PackageProvider -Name NuGet -Force
+        Find-Module IntelliTect* | Install-Module -Force
 
