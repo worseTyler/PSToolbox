@@ -13,7 +13,7 @@ jobs:
         uses: Amadevus/pwsh-script@v2.0.1
         with:
           script: |
-            $changedModules = $(git diff --name-only HEAD HEAD~)
+            $changedModules = $(git diff --name-only HEAD HEAD~1)
             $changedModules
             $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
             $modules = @()
