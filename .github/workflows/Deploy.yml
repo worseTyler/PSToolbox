@@ -71,24 +71,17 @@ jobs:
 
             $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
 
-            $RealPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-            $ArtifactPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-
-                Update-ModuleManifest -Path $RealPath -ModuleVersion $updatedVersion
-                Update-ModuleManifest -Path $ArtifactPath -ModuleVersion $updatedVersion
-
-                $tempManifest = $content | ForEach-Object{
+            $Path = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            Update-ModuleManifest -Path $Path -ModuleVersion $updatedVersion
+            
+            Write-Host "$moduleName's version was updated from $version to $updatedVersion"
+            
+            $content = Get-Content $manifest.PSPath | ForEach-Object{
+                $_
                 if ($_ -match "ModuleVersion"){
-                    "ModuleVersion = '$($updatedVersion.ToString())'"
-                }
-                else {
-                    $_
+                    $version = [System.Version]($_ -split "'")[1]
                 }
             }
-            $tempManifest | Set-Content $manifest.PSPath
-
-            Write-Host "$moduleName's version was updated from $version to $updatedVersion"
+            Write-Host "$version - $updatedVersion"
         }
-        git status
-        Get-ChildItem StagingChangedModules -Recurse
 
