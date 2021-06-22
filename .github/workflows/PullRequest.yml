@@ -26,14 +26,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2      
-      
       - name: DotNet Build
-
         uses: Amadevus/pwsh-script@v2.0.1
         with:
           script: |
             $items = Get-ChildItem -Include *.sln -Recurse
-            $items
             foreach ($item in $items){
                 dotnet build $item
             }
@@ -41,9 +38,7 @@ jobs:
         uses: Amadevus/pwsh-script@v2.0.1
         with:
           script: |
-            
             $items = Get-ChildItem -Include *.sln -Recurse
-            $items
             foreach ($item in $items){
                 dotnet test $item
             }
