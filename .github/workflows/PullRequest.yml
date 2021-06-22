@@ -31,7 +31,8 @@ jobs:
 
         uses: Amadevus/pwsh-script@v2.0.1
         with:
-          script: |   
+          script: |
+            pwd
             $items = Get-ChildItem -Include *.sln -Recurse
             foreach ($item in $items){
                 dotnet build $item
@@ -39,7 +40,8 @@ jobs:
       - name: DotNet Test
         uses: Amadevus/pwsh-script@v2.0.1
         with:
-          script: |   
+          script: |
+            pwd
             $items = Get-ChildItem -Include *.sln -Recurse
             foreach ($item in $items){
                 dotnet test $item
