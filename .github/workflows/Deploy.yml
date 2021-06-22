@@ -37,6 +37,7 @@ jobs:
             $module = $modules[$i]
             Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
         }
+        git status
     - name: Update Changed Modules
       run: |
         $moduleFolders = Get-ChildItem .\StagingChangedModules
@@ -88,4 +89,5 @@ jobs:
 
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
         }
+        git status
 
