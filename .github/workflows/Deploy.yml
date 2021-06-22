@@ -72,7 +72,17 @@ jobs:
             $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
 
             $Path = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-            Update-ModuleManifest -Path $Path -ModuleVersion $updatedVersion
+            #Update-ModuleManifest -Path $Path -ModuleVersion $updatedVersion
+            
+            $tempManifest = $content | ForEach-Object{
+                if ($_ -match "ModuleVersion"){
+                    "ModuleVersion = '$($updatedVersion.ToString())'"
+                }
+                else {
+                    $_
+                }
+            }
+            $tempManifest | Set-Content $Path
             
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
             
