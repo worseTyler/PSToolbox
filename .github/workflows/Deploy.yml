@@ -7,35 +7,38 @@ defaults:
   run:
     shell: pwsh
 jobs:
- Deploy:
+  Setup:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2   
         with:
           fetch-depth: 50
-      - name: DiscoverChanges
-        run: |
-          $changedModules = $(git diff --name-only HEAD HEAD~40)
-          $changedModules
-          $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
-          $modules = @()
+  DiscoverChanges:
+    runs-on: windows-latest
+    needs: Setup
+    steps:
+    - name: DiscoverChanges
+      run: |
+        $changedModules = $(git diff --name-only HEAD HEAD~40)
+        $changedModules
+        $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
+        $modules = @()
 
-          foreach ($file in $files) 
-          {
-              if((Test-Path $file.FullName)){
-                  $file
-                  $fileDirectoryParent = $file.Directory.Parent
-                  if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
-                      $modules += $file.Directory
-                  }
-              }
-          }
-          $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
-          $modules.Length
-          For ($i=0; $i -lt $modules.Length; $i++)
-          {
-              $module = $modules[$i]
-              Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
-          }
-
+        foreach ($file in $files) 
+        {
+            if((Test-Path $file.FullName)){
+                $file
+                $fileDirectoryParent = $file.Directory.Parent
+                if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
+                    $modules += $file.Directory
+                }
+            }
+        }
+        $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
+        $modules.Length
+        For ($i=0; $i -lt $modules.Length; $i++)
+        {
+            $module = $modules[$i]
+            Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
+        }
 
