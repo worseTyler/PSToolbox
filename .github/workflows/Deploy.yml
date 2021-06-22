@@ -30,11 +30,11 @@ jobs:
                     }
                 }
             }
-            #$changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
-            #$modules.Length
-            #For ($i=0; $i -lt $modules.Length; $i++)
-            #{
-              #  $module = $modules[$i]
-             #   Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
-            #}
+            $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
+            $modules.Length
+            For ($i=0; $i -lt $modules.Length; $i++)
+            {
+                $module = $modules[$i]
+                Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
+            }
 
