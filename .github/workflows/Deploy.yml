@@ -13,9 +13,79 @@ jobs:
     - uses: actions/checkout@v2   
       with:
         fetch-depth: 50
-    - name: Import Modules
+    - name: Discover Changes
       run: |
-        Import-Module PackageManagement -RequiredVersion 1.0.0.1
-        Install-PackageProvider -Name NuGet -Force
-        Find-Module IntelliTect* | Install-Module -Force
+        $changedModules = $(git diff --name-only HEAD HEAD~40)
+        $changedModules
+        $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
+        $modules = @()
+
+        foreach ($file in $files) 
+        {
+            if((Test-Path $file.FullName)){
+                $file
+                $fileDirectoryParent = $file.Directory.Parent
+                if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
+                    $modules += $file.Directory
+                }
+            }
+        }
+        $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
+        $modules.Length
+        For ($i=0; $i -lt $modules.Length; $i++)
+        {
+            $module = $modules[$i]
+            Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
+        }
+    - name: Update Changed Modules
+      run: |
+        $moduleFolders = Get-ChildItem .\StagingChangedModules
+        if(!$moduleFolders) {
+            throw "No modules to update."
+        }
+        foreach ($item in $moduleFolders){
+            $moduleName = $item.Name
+            $manifest = Get-ChildItem $item.PSPath | Where-Object{$_.Name -like "*psd1"}
+
+            if(!$manifest){
+                Write-Error "The manifest for $moduleName was not found"
+            }
+
+            $content = Get-Content $manifest.PSPath | ForEach-Object{
+                $_
+                if ($_ -match "ModuleVersion"){
+                    $version = [System.Version]($_ -split "'")[1]
+                }
+            }
+
+        $major = 0
+            $minor = 0
+            $build = 0
+            $minorRev = 1
+
+            if($version.Major -gt 0){$major = $version.Major}
+            if($version.Minor -gt 0){$minor = $version.Minor}
+            if($version.Build -gt 0){$build = $version.Build}
+            if($version.MinorRevision -gt 0){$minorRev = $version.MinorRevision + 1}
+
+            $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
+
+            $RealPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            $ArtifactPath = "\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+
+                Update-ModuleManifest -Path $RealPath -ModuleVersion $updatedVersion
+                Update-ModuleManifest -Path $ArtifactPath -ModuleVersion $updatedVersion
+
+                $tempManifest = $content | ForEach-Object{
+                if ($_ -match "ModuleVersion"){
+                    "ModuleVersion = '$($updatedVersion.ToString())'"
+                }
+                else {
+                    $_
+                }
+            }
+            $tempManifest | Set-Content $manifest.PSPath
+
+            Write-Host "$moduleName's version was updated from $version to $updatedVersion"
+        }
 
