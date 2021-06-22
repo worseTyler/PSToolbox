@@ -29,17 +29,19 @@ jobs:
       
       - name: DotNet Bulid
         uses: Amadevus/pwsh-script@v2.0.1
-        with: |
-          $baseDir = (Get-Item -Path ".\" -Verbose).FullName
-          $items = Get-ChildItem -Path $baseDir -Include *.sln -Recurse
-          foreach ($item in $items){
-              dotnet build $item
-          }
+        with:
+          script: |   
+            $baseDir = (Get-Item -Path ".\" -Verbose).FullName
+            $items = Get-ChildItem -Path $baseDir -Include *.sln -Recurse
+            foreach ($item in $items){
+                dotnet build $item
+            }
       - name: DotNet Test
         uses: Amadevus/pwsh-script@v2.0.1
-        with: |
-          $baseDir = (Get-Item -Path ".\" -Verbose).FullName
-          $items = Get-ChildItem -Path $baseDir -Include *.sln -Recurse
-          foreach ($item in $items){
-              dotnet test $item
-          }
+        with:
+          script: |   
+            $baseDir = (Get-Item -Path ".\" -Verbose).FullName
+            $items = Get-ChildItem -Path $baseDir -Include *.sln -Recurse
+            foreach ($item in $items){
+                dotnet test $item
+            }
