@@ -78,8 +78,8 @@ jobs:
         }
     - name: Push Changes
       run: |
-        #git config --global user.email "tylerjones321@gmail.com"
-        #git config --global user.name "worseTyler"
+        git config --global user.email "tylerjones321@gmail.com"
+        git config --global user.name "worseTyler"
 
         git add Modules/\*.psd1
         git commit -m "[skip ci] Commit from build agent"
