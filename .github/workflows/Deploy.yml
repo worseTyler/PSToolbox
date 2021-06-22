@@ -73,17 +73,15 @@ jobs:
 
             $Path = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
             Update-ModuleManifest -Path $Path -ModuleVersion $updatedVersion
-            
-
-            
+          
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
-            
-            $content = Get-Content $Path | ForEach-Object{
-                $_
-                if ($_ -match "ModuleVersion"){
-                    $version = [System.Version]($_ -split "'")[1]
-                }
-            }
-            Write-Host "$version - $updatedVersion"
         }
+    - name: Push Changes
+      run: |
+        #git config --global user.email "tylerjones321@gmail.com"
+        #git config --global user.name "worseTyler"
+
+        git add Modules/\*.psd1
+        git commit -m "[skip ci] Commit from build agent"
+        git push
 
