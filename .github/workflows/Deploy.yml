@@ -71,8 +71,10 @@ jobs:
 
             $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
 
-            $Path = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-            Update-ModuleManifest -Path $Path -ModuleVersion $updatedVersion
+            $PushPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            $PublishPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            Update-ModuleManifest -Path $PushPath -ModuleVersion $updatedVersion
+            Update-ModuleManifest -Path $PublishPath -ModuleVersion $updatedVersion
           
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
         }
@@ -81,7 +83,13 @@ jobs:
         git config --global user.email "tylerjones321@gmail.com"
         git config --global user.name "worseTyler"
 
-        git add Modules/\*.psd1
-        git commit -m "[skip ci] Commit from build agent"
-        git push
+        #git add Modules/\*.psd1
+        #git commit -m "[skip ci] Commit from build agent"
+        #git push
+    - name: Publish To Gallery
+      run: |
+        $moduleFolders = Get-ChildItem \StagingChangedModules
+        foreach ($item in $moduleFolders){
+          Publish-Module -Path $item.FullName -NuGetApiKey ${{ PowershellGallery.API_KEY }} 
+        }
 
