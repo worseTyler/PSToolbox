@@ -72,7 +72,7 @@ jobs:
             $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
 
             $RealPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-            $ArtifactPath = "\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            $ArtifactPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
 
                 Update-ModuleManifest -Path $RealPath -ModuleVersion $updatedVersion
                 Update-ModuleManifest -Path $ArtifactPath -ModuleVersion $updatedVersion
