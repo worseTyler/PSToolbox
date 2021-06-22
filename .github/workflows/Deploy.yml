@@ -86,7 +86,7 @@ jobs:
             
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
             
-            $content = Get-Content $manifest.PSPath | ForEach-Object{
+            $content = Get-Content $Path | ForEach-Object{
                 $_
                 if ($_ -match "ModuleVersion"){
                     $version = [System.Version]($_ -split "'")[1]
