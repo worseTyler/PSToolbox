@@ -1,0 +1,37 @@
+name: Deploy
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+ Deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2      
+      - name: DiscoverChanges
+        uses: Amadevus/pwsh-script@v2.0.1
+        with:
+          script: |
+            $changedModules = $(git diff --name-only HEAD HEAD~)
+            $changedModules
+            $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
+            $modules = @()
+
+            foreach ($file in $files) 
+            {
+                if((Test-Path $file.FullName)){
+                    $file
+                    $fileDirectoryParent = $file.Directory.Parent
+                    if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
+                        $modules += $file.Directory
+                    }
+                }
+            }
+            #$changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
+            #$modules.Length
+            #For ($i=0; $i -lt $modules.Length; $i++)
+            #{
+              #  $module = $modules[$i]
+             #   Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
+            #}
