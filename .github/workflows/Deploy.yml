@@ -13,4 +13,5 @@ jobs:
         uses: Amadevus/pwsh-script@v2.0.1
         with:
           script: |
-            git log
+            $output = $(git log)
+            Write-Host $output
