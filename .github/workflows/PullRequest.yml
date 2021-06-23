@@ -5,6 +5,9 @@ on:
     branches: [ main ]
 
   workflow_dispatch:
+defaults:
+  run:
+    shell: pwsh
 jobs:
   PesterTest:
     runs-on: windows-latest
@@ -12,33 +15,27 @@ jobs:
       - uses: actions/checkout@v2      
       
       - name: Pester Test
-        uses: Amadevus/pwsh-script@v2.0.1
-        with:
-          script: |     
-            $ConfirmPreference = "None"
+        run: |
+          $ConfirmPreference = "None"
 
-            $testResults = Invoke-Pester -Script .\Modules.Tests\  -OutputFile ${{env.GITHUB_WORKSPACE}}\Test-Pester.XML -OutputFormat NUnitXML -PassThru
-            if($testResults.FailedCount -ne 0) { 
-                 Write-Error "$($testResults.FailedCount) test failed."
-                 exit $LASTEXITCODE 
-            }
+          $testResults = Invoke-Pester -Script .\Modules.Tests\  -OutputFile ${{env.GITHUB_WORKSPACE}}\Test-Pester.XML -OutputFormat NUnitXML -PassThru
+          if($testResults.FailedCount -ne 0) { 
+               Write-Error "$($testResults.FailedCount) test failed."
+               exit $LASTEXITCODE 
+          }
   DotNetBuild:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2      
       - name: DotNet Build
-        uses: Amadevus/pwsh-script@v2.0.1
-        with:
-          script: |
-            $items = Get-ChildItem -Include *.sln -Recurse
-            foreach ($item in $items){
-                dotnet build $item
-            }
+        run: |
+          $items = Get-ChildItem -Include *.sln -Recurse
+          foreach ($item in $items){
+              dotnet build $item
+          }
       - name: DotNet Test
-        uses: Amadevus/pwsh-script@v2.0.1
-        with:
-          script: |
-            $items = Get-ChildItem -Include *.sln -Recurse
-            foreach ($item in $items){
-                dotnet test $item
-            }
+        run: |
+          $items = Get-ChildItem -Include *.sln -Recurse
+          foreach ($item in $items){
+              dotnet test $item
+          }
