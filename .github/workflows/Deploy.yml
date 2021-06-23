@@ -31,8 +31,9 @@ jobs:
                 }
             }
         }
-        if($modules.Length -gt 0){
+        if($modules.Length -eq 0){
           ${{ env.CHANGES_MADE }} = true
+          exit
         }
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
         For ($i=0; $i -lt $modules.Length; $i++)
