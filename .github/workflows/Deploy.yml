@@ -33,7 +33,8 @@ jobs:
         }
         if($modules.Length -eq 0){
           $env:CHANGES_MADE
-          $env:CHANGES_MADE = $true
+          $env:CHANGES_MADE = $TRUE
+          $env:CHANGES_MADE
           exit
         }
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
