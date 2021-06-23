@@ -23,27 +23,25 @@ jobs:
         foreach ($file in $files) 
         {
             if((Test-Path $file.FullName)){
-                $file
                 $fileDirectoryParent = $file.Directory.Parent
                 if ($fileDirectoryParent -and $fileDirectoryParent.Name -eq "Modules") {
                     $modules += $file.Directory
                 }
             }
         }
+        if($modules.Length -eq 0){
+          Write-Host "No Modules Were Changed"
+          exit
+        }
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
-        $modules.Length
         For ($i=0; $i -lt $modules.Length; $i++)
         {
             $module = $modules[$i]
             Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
         }
-        git status
     - name: Update Changed Modules
       run: |
         $moduleFolders = Get-ChildItem .\StagingChangedModules
-        if(!$moduleFolders) {
-            throw "No modules to update."
-        }
         foreach ($item in $moduleFolders){
             $moduleName = $item.Name
             $manifest = Get-ChildItem $item.PSPath | Where-Object{$_.Name -like "*psd1"}
@@ -73,6 +71,7 @@ jobs:
 
             $PushPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
             $PublishPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            
             Update-ModuleManifest -Path $PushPath -ModuleVersion $updatedVersion
             Update-ModuleManifest -Path $PublishPath -ModuleVersion $updatedVersion
           
