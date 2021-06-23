@@ -87,9 +87,11 @@ jobs:
         #git commit -m "[skip ci] Commit from build agent"
         #git push
     - name: Publish To Gallery
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
       run: |
         $moduleFolders = Get-ChildItem .\StagingChangedModules
         foreach ($item in $moduleFolders){
-          Publish-Module -Path $item.FullName -NuGetApiKey ${{ secrets.API_KEY }} 
+          Publish-Module -Path $item.FullName -NuGetApiKey $env:API_KEY
         }
 
