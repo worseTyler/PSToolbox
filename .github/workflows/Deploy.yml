@@ -31,10 +31,8 @@ jobs:
                 }
             }
         }
-        if($modules.Length -eq 0){
-          $env:CHANGES_MADE
+        if($modules.Length -gt 0){
           $env:CHANGES_MADE = $TRUE
-          $env:CHANGES_MADE
           exit
         }
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
