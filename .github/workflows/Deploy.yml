@@ -9,13 +9,13 @@ defaults:
 jobs:
   Deploy:
     runs-on: windows-latest
+    env:
+      CHANGES_MADE: ${{ false }}
     steps:
     - uses: actions/checkout@v2   
       with:
         fetch-depth: 2
     - name: Discover Changes
-      env:
-        CHANGES_MADE: ${{ false }}
       run: |
         $changedModules = $(git diff --name-only HEAD HEAD~)
         $changedModules
