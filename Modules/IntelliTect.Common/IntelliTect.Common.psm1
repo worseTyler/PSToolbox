@@ -14,7 +14,7 @@ Function Add-PathToEnvironmentVariable {
             Set-Item "env:$EnvironmentVariableName"="$Path;$CurrentValue"
         }
     }
-}
+}#############
 
 <#
 .SYNOPSIS
