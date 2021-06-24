@@ -31,8 +31,11 @@ jobs:
                 }
             }
         }
+        $modules.Length
         if($modules.Length -gt 0){
           $env:CHANGES_MADE = $TRUE
+        } else
+        {
           exit
         }
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
@@ -41,17 +44,9 @@ jobs:
             $module = $modules[$i]
             Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
         }
-        "Print working directory"
-        Get-Location
-        "Print sub"
-        Get-ChildItem
     - name: Update Changed Modules
       if: ${{ env.CHANGES_MADE }} 
       run: |
-        "Print working directory"
-        Get-Location
-        "Print sub"
-        Get-ChildItem
         $moduleFolders = Get-ChildItem StagingChangedModules
         foreach ($item in $moduleFolders){
             $moduleName = $item.Name
