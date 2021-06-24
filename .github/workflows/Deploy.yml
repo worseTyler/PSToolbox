@@ -79,7 +79,7 @@ jobs:
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
         }
     - name: Push Changes
-      if: ${{ env.CHANGES_MADE == true }} 
+      if: ${{ env.CHANGES_MADE }} == ${{ true }}
       run: |
         git config --global user.email "tylerjones321@gmail.com"
         git config --global user.name "worseTyler"
