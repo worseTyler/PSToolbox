@@ -41,9 +41,13 @@ jobs:
             $module = $modules[$i]
             Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
         }
+        pwd
+        ls
     - name: Update Changed Modules
       if: ${{ env.CHANGES_MADE }} 
       run: |
+        pwd
+        ls
         $moduleFolders = Get-ChildItem .\StagingChangedModules
         foreach ($item in $moduleFolders){
             $moduleName = $item.Name
