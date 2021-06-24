@@ -12,10 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2   
       with:
-        fetch-depth: 20
+        fetch-depth: 2
     - name: Discover Changes
       run: |
-        $changedModules = $(git diff --name-only HEAD HEAD~19)
+        $changedModules = $(git diff --name-only HEAD HEAD~)
         $changedModules
         $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
         $modules = @()
