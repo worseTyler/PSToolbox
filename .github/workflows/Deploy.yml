@@ -14,10 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2   
       with:
-        fetch-depth: 3
+        fetch-depth: 4
     - name: Discover Changes
       run: |
-        $changedModules = $(git diff --name-only HEAD HEAD~2)
+        $changedModules = $(git diff --name-only HEAD HEAD~3)
         $changedModules
         $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
         $modules = @()
@@ -46,7 +46,7 @@ jobs:
             Copy-Item -Path $module.FullName -Destination $changedModulesPath -Recurse -Force
         }
     - name: Update Changed Modules
-      if: ${{ env.CHANGES_MADE == true }} 
+      if: ${{ env.CHANGES_MADE }} == ${{ true }}
       run: |
         $moduleFolders = Get-ChildItem .\StagingChangedModules
         foreach ($item in $moduleFolders){
@@ -87,7 +87,7 @@ jobs:
         #git commit -m "[skip ci] Commit from build agent"
         #git push
     - name: Publish To Gallery
-      if: ${{ env.CHANGES_MADE == true }} 
+      if: ${{ env.CHANGES_MADE }} == ${{ true }}
       env:
         API_KEY: ${{ secrets.API_KEY }}
       run: |
