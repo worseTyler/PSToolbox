@@ -14,14 +14,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2   
       with:
-        fetch-depth: 100
+        fetch-depth: 2
     - name: Discover Changes
       run: |
-        $changedModules = $(git diff --name-only HEAD HEAD~99)
+        $changedModules = $(git diff --name-only HEAD HEAD~)
         $changedModules
         $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
         $modules = @()
-
         foreach ($file in $files) 
         {
             if((Test-Path $file.FullName)){
@@ -32,12 +31,12 @@ jobs:
             }
         }
         $modules.Length
-        if($modules.Length -gt 0){
-          $env:CHANGES_MADE = $TRUE
-        } else
-        {
+        $env:CHANGES_MADE
+        if($modules.Length -eq 0){
           exit
         }
+        $env:CHANGES_MADE
+        $env:CHANGES_MADE = $TRUE
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
         For ($i=0; $i -lt $modules.Length; $i++)
         {
@@ -47,39 +46,30 @@ jobs:
     - name: Update Changed Modules
       if: ${{ env.CHANGES_MADE }} 
       run: |
-        $moduleFolders = Get-ChildItem StagingChangedModules
+        $moduleFolders = Get-ChildItem .\StagingChangedModules
         foreach ($item in $moduleFolders){
             $moduleName = $item.Name
             $manifest = Get-ChildItem $item.PSPath | Where-Object{$_.Name -like "*psd1"}
-
             if(!$manifest){
                 Write-Error "The manifest for $moduleName was not found"
             }
-
             $content = Get-Content $manifest.PSPath | ForEach-Object{
                 $_
                 if ($_ -match "ModuleVersion"){
                     $version = [System.Version]($_ -split "'")[1]
                 }
             }
-
         $major = 0
             $minor = 0
             $build = 0
             $minorRev = 1
-
             if($version.Major -gt 0){$major = $version.Major}
             if($version.Minor -gt 0){$minor = $version.Minor}
             if($version.Build -gt 0){$build = $version.Build}
             if($version.MinorRevision -gt 0){$minorRev = $version.MinorRevision + 1}
-
             $updatedVersion = New-Object -TypeName system.Version -ArgumentList $major, $minor, $build, $minorRev
-
             $PushPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
             $PublishPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
-            
-            $PushPath
-            $PublishPath
             
             Update-ModuleManifest -Path $PushPath -ModuleVersion $updatedVersion
             Update-ModuleManifest -Path $PublishPath -ModuleVersion $updatedVersion
@@ -91,10 +81,9 @@ jobs:
       run: |
         git config --global user.email "tylerjones321@gmail.com"
         git config --global user.name "worseTyler"
-
-        #git add Modules/\*.psd1
-        #git commit -m "[skip ci] Commit from build agent"
-        #git push
+        git add Modules/\*.psd1
+        git commit -m "[skip ci] Commit from build agent"
+        git push
     - name: Publish To Gallery
       if: ${{ env.CHANGES_MADE }} 
       env:
@@ -102,6 +91,5 @@ jobs:
       run: |
         $moduleFolders = Get-ChildItem .\StagingChangedModules
         foreach ($item in $moduleFolders){
-          #Publish-Module -Path $item.FullName -NuGetApiKey $env:API_KEY
+          Publish-Module -Path $item.FullName -NuGetApiKey $env:API_KEY
         }
-
