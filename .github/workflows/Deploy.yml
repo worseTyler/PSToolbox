@@ -14,10 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2   
       with:
-        fetch-depth: 15
+        fetch-depth: 100
     - name: Discover Changes
       run: |
-        $changedModules = $(git diff --name-only HEAD HEAD~14)
+        $changedModules = $(git diff --name-only HEAD HEAD~99)
         $changedModules
         $files = $changedModules -split ' ' | ForEach-Object{[System.IO.FileInfo] $_}
         $modules = @()
@@ -48,7 +48,7 @@ jobs:
       run: |
         pwd
         ls
-        $moduleFolders = Get-ChildItem .\StagingChangedModules
+        $moduleFolders = Get-ChildItem StagingChangedModules
         foreach ($item in $moduleFolders){
             $moduleName = $item.Name
             $manifest = Get-ChildItem $item.PSPath | Where-Object{$_.Name -like "*psd1"}
