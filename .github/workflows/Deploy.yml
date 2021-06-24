@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 defaults:
   run:
-    shell: pwsh
+    shell: powershell
 jobs:
   Deploy:
     runs-on: windows-latest
@@ -77,6 +77,9 @@ jobs:
 
             $PushPath = ".\Modules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
             $PublishPath = ".\StagingChangedModules\" +($manifest.PSChildName).Substring(0, $manifest.PSChildName.length - 5 ) +  "\"+ ($manifest.PSChildName)
+            
+            $PushPath
+            $PublishPath
             
             Update-ModuleManifest -Path $PushPath -ModuleVersion $updatedVersion
             Update-ModuleManifest -Path $PublishPath -ModuleVersion $updatedVersion
