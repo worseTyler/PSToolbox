@@ -80,7 +80,6 @@ jobs:
             Write-Host "$moduleName's version was updated from $version to $updatedVersion"
         }
     - name: Push Changes
-      if: ${{ env:CHANGES_MADE == 1 }}
       run: |
         if($env:CHANGES_MADE -eq 0) {
           Write-Host "No modules changed"
