@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 defaults:
   run:
-    shell: powershell
+    shell: pwsh
 jobs:
   Deploy:
     runs-on: windows-latest
