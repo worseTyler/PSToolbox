@@ -36,7 +36,7 @@ jobs:
           exit
         }
         $env:CHANGES_MADE
-        $env:CHANGES_MADE = 1
+        ${{ env:CHANGES_MADE = 1 }}
         $env:CHANGES_MADE
 
         $changedModulesPath = mkdir -Name "StagingChangedModules\" -Force
