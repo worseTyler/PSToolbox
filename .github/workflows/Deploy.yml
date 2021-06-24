@@ -44,6 +44,7 @@ jobs:
         }
     - name: Update Changed Modules
       run: |
+        $env:CHANGES_MADE
         if($env.CHANGES_MADE -eq 0) {
           Write-Host "No modules changed"
           exit
